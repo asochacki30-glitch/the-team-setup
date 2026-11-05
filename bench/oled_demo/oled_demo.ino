@@ -15,7 +15,7 @@
 #include <Wire.h>
 
 // Page mode: draws the screen in eight strips with a 128-byte buffer, because
-// the Nano has 2 KB of RAM and a full frame would take half of it.
+// the Nano has 2 KB of RAM and a full frame would take half of it. 
 U8G2_SSD1306_128X64_NONAME_1_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE);
 
 const int TRIG = 9;
