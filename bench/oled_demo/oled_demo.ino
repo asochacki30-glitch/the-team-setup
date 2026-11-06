@@ -20,6 +20,7 @@ U8G2_SSD1306_128X64_NONAME_1_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE);
 
 const int TRIG = 9;
 const int ECHO = 10;
+const int LED = 3;
 
 const float NEAR_CM = 30.0;      // badge thresholds for the screen only;
 const float HERE_CM = 120.0;     // the real State Table lives in the browser
@@ -36,6 +37,8 @@ uint8_t ping = 0;                // expanding ring radius
 uint8_t rate = 0;                // readings in the last second, for the header
 uint8_t count = 0;
 unsigned long rateStart = 0;
+unsigned long ledToggleAt = 0;
+bool ledOn = false;
 
 float readCm() {
   digitalWrite(TRIG, LOW);
@@ -61,7 +64,7 @@ void splash() {
 
 void drawHeader(float cm) {
   // Rows 0-15, the yellow strip: state badge left, readings per second right.
-  const char *label = cm < NEAR_CM ? "NEAR" : cm < HERE_CM ? "HERE" : "EMPTY";
+  const char *label = cm < NEAR_CM ? "NEAR" : cm < HERE_CM ? "HERE" : "CLEAR";
   oled.setFont(u8g2_font_6x12_tr);
   int w = oled.getStrWidth(label) + 8;
   if (cm < NEAR_CM) {              // near: solid badge
@@ -133,6 +136,8 @@ void setup() {
   Serial.begin(115200);          // sense-serial.js opens the port at this speed
   pinMode(TRIG, OUTPUT);
   pinMode(ECHO, INPUT);
+  pinMode(LED, OUTPUT);
+  digitalWrite(LED, LOW);
   oled.begin();
   oled.setBusClock(400000);
   splash();
@@ -146,6 +151,18 @@ void loop() {
   Serial.println();
 
   smooth += (min(cm, 400.0f) - smooth) * 0.35;
+
+  if (smooth >= HERE_CM) {
+    if (millis() - ledToggleAt >= 500) {
+      ledOn = !ledOn;
+      digitalWrite(LED, ledOn ? HIGH : LOW);
+      ledToggleAt = millis();
+    }
+  } else {
+    ledOn = false;
+    digitalWrite(LED, LOW);
+    ledToggleAt = millis();
+  }
 
   count++;
   if (millis() - rateStart >= 1000) {

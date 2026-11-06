@@ -39,6 +39,10 @@ This one works, end to end: a Nano and an HC-SR04 on a breadboard, with an optio
 
 Flash `bench/bench.ino` for the sensor alone. Open `bench.html` on localhost in Chrome, click **Connect the Arduino**, and pick the board. Press **D**: a hand at about 40 cm or closer reads `close`, further away reads `here`, and an empty room reads `nobody` after two seconds.
 
+### VS Code
+
+For VS Code builds and uploads, install the PlatformIO IDE extension and open the `bench` folder as the project. Build once to let PlatformIO configure C++ IntelliSense, then use the `nano` environment for a current bootloader or `nano_old` for the old bootloader. Select the Nano's serial port in PlatformIO before uploading.
+
 **The lag is the table, not the wire.** Each row's hold (0.5, 1 and 2 seconds in `bench/table-bench.js`) is how long a rule has to stay true before the state changes, and the readings are smoothed so one bad echo doesn't count. Short holds feel instant and flicker; long holds feel calm and slow. Choosing them is part of your table.
 
 **If the upload fails** with `not in sync` or `programmer is not responding`, the Nano has the old bootloader, which is common on clone boards. In the Arduino IDE choose **Tools → Processor → ATmega328P (Old Bootloader)** and upload again (in `arduino-cli`, the board is `arduino:avr:nano:cpu=atmega328old`). After a failed upload, unplug the Nano and plug it back in before the next try, because the port can stay stuck.
